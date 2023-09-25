@@ -347,7 +347,7 @@ class EMEController implements ComponentAPI {
         this.generateRequestWithPreferredKeySession(
           keySessionContext,
           scheme,
-          decryptdata.pssh,
+          decryptdata.pssh.buffer,
           'expired',
         );
     } else {
@@ -444,10 +444,13 @@ class EMEController implements ComponentAPI {
                 decryptdata,
               });
               const scheme = 'cenc';
+              const initData = decryptdata.pssh
+                ? decryptdata.pssh?.buffer
+                : null;
               return this.generateRequestWithPreferredKeySession(
                 keySessionContext,
                 scheme,
-                decryptdata.pssh,
+                initData,
                 'playlist-key',
               );
             });
@@ -692,9 +695,8 @@ class EMEController implements ComponentAPI {
           );
         }
         initDataType = mappedInitData.initDataType;
-        initData = context.decryptdata.pssh = mappedInitData.initData
-          ? new Uint8Array(mappedInitData.initData)
-          : null;
+        initData = mappedInitData.initData ? mappedInitData.initData : null;
+        context.decryptdata.pssh = initData ? new Uint8Array(initData) : null;
       } catch (error) {
         this.warn(error.message);
         if (this.hls?.config.debug) {

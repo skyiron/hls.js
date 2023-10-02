@@ -544,7 +544,7 @@ class EMEController implements ComponentAPI {
       const json = bin2str(new Uint8Array(initData));
       try {
         const sinf = base64Decode(JSON.parse(json).sinf);
-        const tenc = parseSinf(new Uint8Array(sinf));
+        const tenc = parseSinf(sinf);
         if (!tenc) {
           return;
         }

@@ -346,6 +346,9 @@ export default class StreamController
       );
     }
     if (!frag) {
+      this.useVideoBufferIfDifferentFromCombined(
+        'No frag available at end of combined buffer',
+      );
       return;
     }
     if (frag.initSegment && !frag.initSegment.data && !this.bitrateTest) {
@@ -808,17 +811,23 @@ export default class StreamController
     const trackId = data.id;
     const altAudio = !!this.hls.audioTracks[trackId].url;
     if (altAudio) {
-      const videoBuffer = this.videoBuffer;
-      // if we switched on alternate audio, ensure that main fragment scheduling is synced with video sourcebuffer buffered
-      if (videoBuffer && this.mediaBuffer !== videoBuffer) {
-        this.log(
-          'Switching on alternate audio, use video.buffered to schedule main fragment loading',
-        );
-        this.mediaBuffer = videoBuffer;
-      }
+      this.useVideoBufferIfDifferentFromCombined(
+        'Switching on alternate audio',
+      );
     }
     this.altAudio = altAudio;
     this.tick();
+  }
+
+  private useVideoBufferIfDifferentFromCombined(reason: string) {
+    const videoBuffer = this.videoBuffer;
+    // if we switched on alternate audio, ensure that main fragment scheduling is synced with video sourcebuffer buffered
+    if (videoBuffer && this.mediaBuffer !== videoBuffer) {
+      this.log(
+        reason + ', use video.buffered to schedule main fragment loading',
+      );
+      this.mediaBuffer = videoBuffer;
+    }
   }
 
   private onBufferCreated(

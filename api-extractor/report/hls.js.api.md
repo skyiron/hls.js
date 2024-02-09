@@ -1695,6 +1695,7 @@ export type HlsConfig = {
     minAutoBitrate: number;
     ignoreDevicePixelRatio: boolean;
     preferManagedMediaSource: boolean;
+    timelineOffset?: number;
     loader: {
         new (confg: HlsConfig): Loader<LoaderContext>;
     };

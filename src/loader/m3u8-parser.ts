@@ -352,6 +352,7 @@ export default class M3U8Parser {
     type: PlaylistLevelType,
     levelUrlId: number,
     multivariantVariableList: VariableMap | null,
+    timelineOffset?: number,
   ): LevelDetails {
     const level = new LevelDetails(baseurl);
     const fragments: M3U8ParserFragments = level.fragments;
@@ -369,6 +370,7 @@ export default class M3U8Parser {
     let firstPdtIndex = -1;
     let createNextFrag = false;
     let nextByteRange: string | null = null;
+    timelineOffset = Math.max(timelineOffset || 0, 0);
 
     LEVEL_PLAYLIST_REGEX_FAST.lastIndex = 0;
     level.m3u8 = string;
@@ -381,7 +383,7 @@ export default class M3U8Parser {
         createNextFrag = false;
         frag = new Fragment(type, baseurl);
         // setup the next fragment for part loading
-        frag.start = totalduration;
+        frag.start = totalduration + timelineOffset;
         frag.sn = currentSN;
         frag.cc = discontinuityCounter;
         frag.level = id;
@@ -407,7 +409,7 @@ export default class M3U8Parser {
       } else if (result[3]) {
         // url
         if (Number.isFinite(frag.duration)) {
-          frag.start = totalduration;
+          frag.start = totalduration + timelineOffset;
           if (levelkeys) {
             setFragLevelKeys(frag, levelkeys, level);
           }
